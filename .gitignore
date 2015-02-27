@@ -1,0 +1,10 @@
+# List of folders & file names/extensions to be ignored by the git repository.
+
+src/PTE_Interface_Panel.X/funclist
+src/PTE_Interface_Panel.X/l.obj
+src/PTE_Interface_Panel.X/build
+src/PTE_Interface_Panel.X/dist
+src/PTE_Interface_Panel.X/nbproject/*
+!src/PTE_Interface_Panel.X/nbproject/configurations.xml
+!src/PTE_Interface_Panel.X/nbproject/project.xml
+
