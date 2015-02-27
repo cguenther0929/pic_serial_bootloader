@@ -139,4 +139,4 @@
 #define BOOTLOADERSIZE  .708
 
 #define MAJOR_VERSION   .1              ; Bootloader Firmware Version
-#define MINOR_VERSION   .5
+#define MINOR_VERSION   .6
