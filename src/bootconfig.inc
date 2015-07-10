@@ -62,9 +62,9 @@
     ; For Bootloader located at program memory address 0, the application firmware must 
     ; provide remapped reset and interrupt vectors outside of the Boot Block. The following 
     ; #defines tell the bootloader firmware where application entry points are to be expected:
-    #define AppVector           0x1000   ; application start up code should be located here.
-    #define AppHighIntVector    0x1008   ; application high priority interrupt should be located here
-    #define AppLowIntVector     0x1018   ; application low priority interrupt should be located here
+    #define AppVector           0x800   ; application start up code should be located here.
+    #define AppHighIntVector    0x808   ; application high priority interrupt should be located here
+    #define AppLowIntVector     0x818   ; application low priority interrupt should be located here
   #endif
 #endif
 
@@ -136,7 +136,7 @@
 ; If you see the bootloader is reserving more FLASH memory than it really needs (you'll
 ; see a bunch of FFFF/NOP instructions at the end of the bootloader memory region),
 ; you can try reducing BOOTLOADERSIZE.
-#define BOOTLOADERSIZE  .708
+#define BOOTLOADERSIZE  .752  			;Original value was .708
 
 #define MAJOR_VERSION   .1              ; Bootloader Firmware Version
-#define MINOR_VERSION   .7
+#define MINOR_VERSION   .8
