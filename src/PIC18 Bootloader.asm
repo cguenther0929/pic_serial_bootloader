@@ -109,61 +109,17 @@
 #include "devices.inc"
 #include "bootconfig.inc"
 #include "preprocess.inc"
+
 ; *****************************************************************************
+; Define configraution bits
 ; *****************************************************************************
-; PIC18F6620 Configuration Bit Settings
-; CONFIG1H
-  CONFIG  OSC = ECIO            ; Oscillator Selection bits (EC oscillator w/ OSC2 configured as RA6)
-  CONFIG  OSCS = OFF            ; Oscillator System Clock Switch Enable bit (Oscillator system clock switch option is disabled (main oscillator is source))
 
-; CONFIG2L
-  CONFIG  PWRT = ON             ; Power-up Timer Enable bit (PWRT enabled)
-  CONFIG  BOR = ON              ; Brown-out Reset Enable bit (Brown-out Reset enabled)
-  CONFIG  BORV = 25             ; Brown-out Reset Voltage bits (VBOR set to 2.5V)
-
-; CONFIG2H
-  CONFIG  WDT = OFF             ; Watchdog Timer Enable bit (WDT disabled (control is placed on the SWDTEN bit))
-  CONFIG  WDTPS = 128           ; Watchdog Timer Postscale Select bits (1:128)
-
-; CONFIG3L
-
-; CONFIG3H
-  CONFIG  CCP2MUX = ON          ; CCP2 Mux bit (CCP2 input/output is multiplexed with RC1)
-
-; CONFIG4L
-  CONFIG  STVR = ON             ; Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)
-  CONFIG  LVP = OFF             ; Low-Voltage ICSP Enable bit (Low-voltage ICSP disabled)
-
-; CONFIG5L
-  CONFIG  CP0 = OFF             ; Code Protection bit (Block 0 (000200-003FFFh) not code-protected)
-  CONFIG  CP1 = OFF             ; Code Protection bit (Block 1 (004000-007FFFh) not code-protected)
-  CONFIG  CP2 = OFF             ; Code Protection bit (Block 2 (008000-00BFFFh) not code-protected)
-  CONFIG  CP3 = OFF             ; Code Protection bit (Block 3 (00C000-00FFFFh) not code-protected)
-
-; CONFIG5H
-  CONFIG  CPB = OFF             ; Boot Block Code Protection bit (Boot Block (000000-0001FFh) not code-protected)
-  CONFIG  CPD = OFF             ; Data EEPROM Code Protection bit (Data EEPROM not code-protected)
-
-; CONFIG6L
-  CONFIG  WRT0 = OFF            ; Write Protection bit (Block 0 (000200-003FFFh) not write-protected)
-  CONFIG  WRT1 = OFF            ; Write Protection bit (Block 1 (004000-007FFFh) not write-protected)
-  CONFIG  WRT2 = OFF            ; Write Protection bit (Block 2 (008000-00BFFFh) not write-protected)
-  CONFIG  WRT3 = OFF            ; Write Protection bit (Block 3 (00C000-00FFFFh) not write-protected)
-
-; CONFIG6H
-  CONFIG  WRTC = OFF            ; Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) not write-protected)
-  CONFIG  WRTB = OFF            ; Boot Block Write Protection bit (Boot Block (000000-0001FFh) not write-protected)
-  CONFIG  WRTD = OFF            ; Data EEPROM Write Protection bit (Data EEPROM not write-protected)
-
-; CONFIG7L
-  CONFIG  EBTR0 = OFF           ; Table Read Protection bit (Block 0 (000200-003FFFh) not protected from table reads executed in other blocks)
-  CONFIG  EBTR1 = OFF           ; Table Read Protection bit (Block 1 (004000-007FFFh) not protected from table reads executed in other blocks)
-  CONFIG  EBTR2 = OFF           ; Table Read Protection bit (Block 2 (008000-00BFFFh) not protected from table reads executed in other blocks)
-  CONFIG  EBTR3 = OFF           ; Table Read Protection bit (Block 3 (00C000-00FFFFh) not protected from table reads executed in other blocks)
-
-; CONFIG7H
-  CONFIG  EBTRB = OFF           ; Boot Block Table Read Protection bit (Boot Block (000000-0001FFh) not protected from table reads executed in other blocks)
+    config OSC=ECIO, OSCS=OFF, PWRT=ON, BOR=ON, BORV=27, WDT=OFF, WDTPS=128
+    config CCP2MUX=OFF, STVR=ON, LVP=OFF, DEBUG=OFF, CP0=OFF, CP1=OFF, CP2=OFF, CP3=OFF
+    config CPB=OFF, CPD=OFF, WRT0=OFF, WRT1=OFF, WRT2=OFF, WRT3=OFF, WRTB=OFF, WRTC=OFF, WRTD=OFF
+    config EBTR0=OFF, EBTR1=OFF, EBTR2=OFF, EBTR3=OFF, EBTRB=OFF
 ; *****************************************************************************
+
 ; *****************************************************************************
 #define STX             0x0F            
 #define ETX             0x04
@@ -188,6 +144,7 @@ ADDRESS_X           equ 0x09
 DATA_COUNTL         equ 0x0A
 PACKET_DATA         equ 0x0B
 DATA_COUNTH         equ 0x0B        ; only for certain commands
+
 ; *****************************************************************************
 
 ; *****************************************************************************
