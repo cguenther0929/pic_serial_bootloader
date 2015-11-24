@@ -138,5 +138,5 @@
 ; you can try reducing BOOTLOADERSIZE.
 #define BOOTLOADERSIZE  .752  			;Original value was .708
 
-#define MAJOR_VERSION   .1              ; Bootloader Firmware Version
-#define MINOR_VERSION   .9
+#define MAJOR_VERSION   .2              ; Bootloader Firmware Version
+#define MINOR_VERSION   .0

@@ -114,10 +114,70 @@
 ; Define configraution bits
 ; *****************************************************************************
 
-    config OSC=ECIO, OSCS=OFF, PWRT=ON, BOR=ON, BORV=27, WDT=ON, WDTPS=128
-    config CCP2MUX=OFF, STVR=ON, LVP=OFF, DEBUG=OFF, CP0=OFF, CP1=OFF, CP2=OFF, CP3=OFF
-    config CPB=OFF, CPD=OFF, WRT0=OFF, WRT1=OFF, WRT2=OFF, WRT3=OFF, WRTB=OFF, WRTC=OFF, WRTD=OFF
-    config EBTR0=OFF, EBTR1=OFF, EBTR2=OFF, EBTR3=OFF, EBTRB=OFF
+; CONFIG1L
+    config RETEN = ON       ; VREG Sleep Enable bit (Enabled)
+    config INTOSCSEL = HIGH ; LF-INTOSC Low-power Enable bit (LF-INTOSC in High-power mode during Sleep)
+    config SOSCSEL = DIG    ; SOSC Power Selection and mode Configuration bits (High Power SOSC circuit selected)
+    config XINST = OFF      ; Extended Instruction Set (Disabled)
+    
+; CONFIG1H
+    config FOSC = EC3       ; Oscillator (EC oscillator (High power, 16 MHz - 64 MHz))
+    config PLLCFG = OFF     ; PLL x4 Enable bit (Disabled)
+    config FCMEN = ON       ; Fail-Safe Clock Monitor (Enabled)
+    config IESO = OFF       ; Internal External Oscillator Switch Over Mode (Disabled)
+    
+; CONFIG2L
+    config PWRTEN = ON      ; Power Up Timer (Enabled)
+    config BOREN = SBORDIS  ; Brown Out Detect (Enabled in hardware, SBOREN disabled)
+    config BORV = 1         ; Brown-out Reset Voltage bits (2.7V)
+    config BORPWR = ZPBORMV ; BORMV Power level (ZPBORMV instead of BORMV is selected)
+    
+; CONFIG2H
+    config WDTEN = ON       ; Watchdog Timer (WDT controlled by SWDTEN bit setting)
+    config WDTPS = 256      ; Watchdog Postscaler (1:256)
+    ;
+; CONFIG3L
+    config RTCOSC = SOSCREF ; RTCC Clock Select (RTCC uses SOSC)
+    ;
+; CONFIG3H
+    config CCP2MX = PORTBE  ; TODO comment
+    config MSSPMSK = MSK7   ; MSSP address masking (7 Bit address masking mode)
+    config MCLRE = ON       ; Master Clear Enable (MCLR Enabled, RG5 Disabled)
+    
+; CONFIG4L
+    config STVREN = ON      ; Stack Overflow Reset (Enabled)
+    config BBSIZ = BB2K     ; Boot Block Size (2K word Boot Block size)
+    
+; CONFIG5L
+    config CP0 = OFF        ; Code Protect 00800-03FFF (Disabled)
+    config CP1 = OFF        ; Code Protect 04000-07FFF (Disabled)
+    config CP2 = OFF        ; Code Protect 08000-0BFFF (Disabled)
+    config CP3 = OFF        ; Code Protect 0C000-0FFFF (Disabled)
+    
+; CONFIG5H
+    config CPB = OFF        ; Code Protect Boot (Disabled)
+    config CPD = OFF        ; Data EE Read Protect (Disabled)
+    
+; CONFIG6L
+    config WRT0 = OFF       ; Table Write Protect 00800-03FFF (Disabled)
+    config WRT1 = OFF       ; Table Write Protect 04000-07FFF (Disabled)
+    config WRT2 = OFF       ; Table Write Protect 08000-0BFFF (Disabled)
+    config WRT3 = OFF       ; Table Write Protect 0C000-0FFFF (Disabled)
+    
+; CONFIG6H
+    config WRTC = OFF       ; Config. Write Protect (Disabled)
+    config WRTB = OFF       ; Table Write Protect Boot (Disabled)
+    config WRTD = OFF       ; Data EE Write Protect (Disabled)
+    
+; CONFIG7L
+    config EBRT0 = OFF      ; Table Read Protect 00800-03FFF (Disabled)
+    config EBRT1 = OFF      ; Table Read Protect 04000-07FFF (Disabled)
+    config EBRT2 = OFF      ; Table Read Protect 08000-0BFFF (Disabled)
+    config EBRT3 = OFF      ; Table Read Protect 0C000-0FFFF (Disabled)
+
+; CONFIG7H
+    config EBRTB = OFF      ; Table Read Protect Boot (Disabled)
+
 ; *****************************************************************************
 
 ; *****************************************************************************
