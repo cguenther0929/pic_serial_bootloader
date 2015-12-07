@@ -156,7 +156,7 @@
     
 ; CONFIG5H
     config CPB = OFF        ; Code Protect Boot (Disabled)
-    config CPD = ON         ; Data EEPROM Protect (Enabled) -- processor can still read / write
+    config CPD = OFF        ; Data EEPROM Protect (Disabled)
     
 ; CONFIG6L
     config WRT0 = OFF       ; Table Write Protect 00800-03FFF (Disabled)
@@ -257,37 +257,41 @@ BootloaderBreakCheck:
 #ifdef INVERT_UART
     btfss   RXPORT, RXPIN
 GotoAppVector:
-    bsf     RCSTA1,SPEN         ;Serial port enable bit set
-    bsf     RCSTA1,CREN         ;When in async mode, enable reciever
-    bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
-    bsf     TXSTA1,TXEN         ;Enable the transmitter
-    bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
-    bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
-    bsf     RCON,IPEN           ;Enable interrupt priority
-    bsf     PIE1,RC1IE          ;Enable the receiver interrupt
-    bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
-    bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
-    bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
-    movlw   APPBAUD             ;Load value 17 into general register
-    movwf   SPBRG              ;Load the above value into register SPBRG1
+    #ifdef CONFIGUART
+        bsf     RCSTA1,SPEN         ;Serial port enable bit set
+        bsf     RCSTA1,CREN         ;When in async mode, enable reciever
+        bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
+        bsf     TXSTA1,TXEN         ;Enable the transmitter
+        bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
+        bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
+        bsf     RCON,IPEN           ;Enable interrupt priority
+        bsf     PIE1,RC1IE          ;Enable the receiver interrupt
+        bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
+        bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
+        bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
+        movlw   APPBAUD             ;Load value 17 into general register
+        movwf   SPBRG              ;Load the above value into register SPBRG1
+    #endif
 
     goto    AppVector           ; no BREAK state, attempt to start application
 #else
     btfsc   RXPORT, RXPIN
 GotoAppVector:
-    bsf     RCSTA1,SPEN         ;Serial port enable bit set
-    bsf     RCSTA1,CREN         ;When in async mode, enable reciever
-    bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
-    bsf     TXSTA1,TXEN         ;Enable the transmitter
-    bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
-    bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
-    bsf     RCON,IPEN           ;Enable interrupt priority
-    bsf     PIE1,RC1IE          ;Enable the receiver interrupt
-    bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
-    bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
-    bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
-    movlw   APPBAUD             ;Load value 17 into general register
-    movwf   SPBRG              ;Load the above value into register SPBRG1
+   #ifdef CONFIGUART
+        bsf     RCSTA1,SPEN         ;Serial port enable bit set
+        bsf     RCSTA1,CREN         ;When in async mode, enable reciever
+        bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
+        bsf     TXSTA1,TXEN         ;Enable the transmitter
+        bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
+        bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
+        bsf     RCON,IPEN           ;Enable interrupt priority
+        bsf     PIE1,RC1IE          ;Enable the receiver interrupt
+        bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
+        bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
+        bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
+        movlw   APPBAUD             ;Load value 17 into general register
+        movwf   SPBRG              ;Load the above value into register SPBRG1
+    #endif
     
     goto    AppVector           ; no BREAK state, attempt to start application
 #endif
@@ -332,19 +336,21 @@ CheckAppVector2:
     tblrd   *+                  ; read instruction from program memory
     incfsz  TABLAT, W           ; if the lower byte != 0xFF,
 GotoAppVector:
-    bsf     RCSTA1,SPEN         ;Serial port enable bit set
-    bsf     RCSTA1,CREN         ;When in async mode, enable reciever
-    bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
-    bsf     TXSTA1,TXEN         ;Enable the transmitter
-    bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
-    bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
-    bsf     RCON,IPEN           ;Enable interrupt priority
-    bsf     PIE1,RC1IE          ;Enable the receiver interrupt
-    bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
-    bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
-    bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
-    movlw   APPBAUD             ;Load value 17 into general register
-    movwf   SPBRG              ;Load the above value into register SPBRG1
+    #ifdef CONFIGUART
+        bsf     RCSTA1,SPEN         ;Serial port enable bit set
+        bsf     RCSTA1,CREN         ;When in async mode, enable reciever
+        bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
+        bsf     TXSTA1,TXEN         ;Enable the transmitter
+        bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
+        bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
+        bsf     RCON,IPEN           ;Enable interrupt priority
+        bsf     PIE1,RC1IE          ;Enable the receiver interrupt
+        bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
+        bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
+        bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
+        movlw   APPBAUD             ;Load value 17 into general register
+        movwf   SPBRG              ;Load the above value into register SPBRG1
+    #endif
     
     goto    AppVector           ; no BREAK state, attempt to start application
     goto    AppVector           ; run application.
