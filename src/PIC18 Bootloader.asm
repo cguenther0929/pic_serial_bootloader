@@ -24,30 +24,30 @@
 ;
 ; Author        Date        Comment
 ; ************************************************************************
-; E. Schlunder  07/20/2010  Software Boot Block Write Protect code 
+; E. Schlunder  07/20/2010  Software Boot Block Write Protect code
 ;                           improved. 96KB memory size devices should
 ;                           work now.
 ; E. Schlunder  02/26/2010  Changed order of start up code so that PLLEN
-;                           is enabled before we wait for RXD IDLE state. 
-;                           This improves connection time/reliablity on 
+;                           is enabled before we wait for RXD IDLE state.
+;                           This improves connection time/reliablity on
 ;                           J devices.
 ; E. Schlunder  08/28/2009  Software Boot Block Write Protect option.
-; E. Schlunder  07/09/2009  Brought back support for bootloader at 
-;                           address 0 for hardware boot block write 
+; E. Schlunder  07/09/2009  Brought back support for bootloader at
+;                           address 0 for hardware boot block write
 ;                           protection on certain devices.
 ; E. Schlunder  05/07/2009  Replaced the simple checksum with a
-;                           16-bit CCIT CRC checksum. 
+;                           16-bit CCIT CRC checksum.
 ;                           Added ReadFlashCrc command for quick verify.
 ; E. Schlunder  05/02/2009  Improved autobaud code to handle 1Mbps
 ;                           and BRG16/BRGH.
 ; E. Schlunder  05/01/2009  Added support for DEVICES.INC generated
-;                           from Device Database tool. 
+;                           from Device Database tool.
 ; E. Schlunder  04/29/2009  Added support for locating the bootloader
 ;                           at the end of program memory instead of
 ;                           the beginning. This will eventually let us
 ;                           use normal application firmware code without
 ;                           linker script modifications.
-; E. Schlunder  04/26/2009  Optimized Config Write routine to avoid 
+; E. Schlunder  04/26/2009  Optimized Config Write routine to avoid
 ;                           re-writing values matching existing config
 ;                           data.
 ; E. Schlunder  04/24/2009  Optimized EEPROM Write routine a little bit.
@@ -67,21 +67,21 @@
 ;                           does 64 byte block aligned writes at all
 ;                           times on J device, so there is no need for
 ;                           this command going forward.
-; E. Schlunder  04/14/2009  Added a BootloadMode vector back at the 
+; E. Schlunder  04/14/2009  Added a BootloadMode vector back at the
 ;                           beginning of program memory so that user
-;                           applications can jump back into the boot 
+;                           applications can jump back into the boot
 ;                           loader without having to erase the boot flag.
-; E. Schlunder  04/08/2009  Now initializes FSR2 to 0 so that the code 
+; E. Schlunder  04/08/2009  Now initializes FSR2 to 0 so that the code
 ;                           can operate under Extended Instruction Set
 ;                           mode if necessary.
 ; E. Schlunder  04/01/2009  Fixed bug in J_FLASH erase address increment.
 ;                           Added support for enabling PLL.
 ;                           Added support for inverted UART signaling.
-;                           Added support for fixed (non-autobaud) 
+;                           Added support for fixed (non-autobaud)
 ;                           operation, helps with debugging code under ICD.
 ; E. Schlunder  03/25/2009  No longer attempts to use EEADRH on PIC18F4321.
 ;
-; UART Bootloader for PIC18F by Ross Fosler 
+; UART Bootloader for PIC18F by Ross Fosler
 ; 09/01/2006  Modified to support PIC18xxJxx & 160k PIC18Fxxx Flash Devices
 ; 03/01/2002 ... First full implementation
 ; 03/07/2002 Changed entry method to use last byte of EEDATA.
@@ -91,15 +91,15 @@
 ; 03/09/2002 Modified the erase command to do multiple row erase.
 ; 03/12/2002 Fixed write problem to CONFIG area. Write was offset by a byte.
 ; 03/15/2002 Added work around for 18F8720 tblwt*+ problem.
-; 03/20/2002 Modified receive & parse engine to vector to autobaud on a checksum 
+; 03/20/2002 Modified receive & parse engine to vector to autobaud on a checksum
 ;            error since a chechsum error could likely be a communications problem.
-; 03/22/2002 Removed clrwdt from the startup. This instruction affects the TO and 
-;            PD flags. Removing this instruction should have no affect on code 
+; 03/22/2002 Removed clrwdt from the startup. This instruction affects the TO and
+;            PD flags. Removing this instruction should have no affect on code
 ;       operation since the wdt is cleared on a reset and boot entry is always
 ;       on a reset.
-; 03/22/2002    Modified the protocol to incorporate the autobaud as part of the 
+; 03/22/2002    Modified the protocol to incorporate the autobaud as part of the
 ;       first received <STX>. Doing this improves robustness by allowing
-;       re-sync under any condition. Previously it was possible to enter a 
+;       re-sync under any condition. Previously it was possible to enter a
 ;       state where only a hard reset would allow re-syncing.
 ; 03/27/2002    Removed the boot vector and related code. This could lead to customer
 ;       issues. There is a very minute probability that errent code execution
@@ -114,17 +114,78 @@
 ; Define configraution bits
 ; *****************************************************************************
 
-    config OSC=ECIO, OSCS=OFF, PWRT=ON, BOR=ON, BORV=27, WDT=OFF, WDTPS=128
-    config CCP2MUX=OFF, STVR=ON, LVP=OFF, DEBUG=OFF, CP0=OFF, CP1=OFF, CP2=OFF, CP3=OFF
-    config CPB=OFF, CPD=OFF, WRT0=OFF, WRT1=OFF, WRT2=OFF, WRT3=OFF, WRTB=OFF, WRTC=OFF, WRTD=OFF
-    config EBTR0=OFF, EBTR1=OFF, EBTR2=OFF, EBTR3=OFF, EBTRB=OFF
+; CONFIG1L
+    config RETEN = ON       ; VREG Sleep Enable bit (Enabled)
+    config INTOSCSEL = HIGH ; LF-INTOSC Low-power Enable bit (LF-INTOSC in High-power mode during Sleep)
+    config SOSCSEL = DIG    ; SOSC Power Selection and mode Configuration bits (Make this a digital pin for TACH1B)
+    config XINST = OFF      ; Extended Instruction Set (Disabled)
+    
+; CONFIG1H
+    config FOSC = EC3       ; Oscillator (EC oscillator (High power, 16 MHz - 64 MHz))
+    config PLLCFG = OFF     ; PLL x4 Enable bit (Disabled)
+    config FCMEN = ON       ; Fail-Safe Clock Monitor (Enabled)
+    config IESO = OFF       ; Internal External Oscillator Switch Over Mode (Disabled)
+    
+; CONFIG2L
+    config PWRTEN = ON      ; Power Up Timer (Enabled)
+    config BOREN = SBORDIS  ; Brown Out Detect (Enabled in hardware, SBOREN disabled)
+    config BORV = 1         ; Brown-out Reset Voltage bits (2.7V)
+    config BORPWR = ZPBORMV ; BORMV Power level (ZPBORMV instead of BORMV is selected)
+    
+; CONFIG2H
+    config WDTEN = ON       ; Watchdog Timer (WDT controlled by SWDTEN bit setting)
+    config WDTPS = 256      ; Watchdog Postscaler (1:256)
+    ;
+; CONFIG3L
+    config RTCOSC = SOSCREF ; RTCC Clock Select (RTCC uses SOSC)
+    ;
+; CONFIG3H
+    config CCP2MX = PORTBE  ; CCP2 Mux (RE7-Microcontroller Mode/RB3-All other modes)
+    config MSSPMSK = MSK7   ; MSSP address masking (7 Bit address masking mode)
+    config MCLRE = ON       ; Master Clear Enable (MCLR Enabled, RG5 Disabled)
+    
+; CONFIG4L
+    config STVREN = ON      ; Stack Overflow Reset (Enabled)
+    config BBSIZ = BB1K     ; Boot Block Size (2K word Boot Block size)
+    
+; CONFIG5L
+    config CP0 = OFF        ; Code Protect 00800-03FFF (Disabled)
+    config CP1 = OFF        ; Code Protect 04000-07FFF (Disabled)
+    config CP2 = OFF        ; Code Protect 08000-0BFFF (Disabled)
+    config CP3 = OFF        ; Code Protect 0C000-0FFFF (Disabled)
+    
+; CONFIG5H
+    config CPB = OFF        ; Code Protect Boot (Disabled)
+    config CPD = OFF        ; Data EEPROM Protect (Disabled)
+    
+; CONFIG6L
+    config WRT0 = OFF       ; Table Write Protect 00800-03FFF (Disabled)
+    config WRT1 = OFF       ; Table Write Protect 04000-07FFF (Disabled)
+    config WRT2 = OFF       ; Table Write Protect 08000-0BFFF (Disabled)
+    config WRT3 = OFF       ; Table Write Protect 0C000-0FFFF (Disabled)
+    
+; CONFIG6H
+    config WRTC = OFF       ; Config. Write Protect (Disabled)
+    config WRTB = OFF       ; Table Write Protect Boot (Disabled)
+    config WRTD = OFF       ; Data EE Write Protect (Disabled)
+    
+; CONFIG7L
+    config EBRT0 = OFF      ; Table Read Protect 00800-03FFF (Disabled)
+    config EBRT1 = OFF      ; Table Read Protect 04000-07FFF (Disabled)
+    config EBRT2 = OFF      ; Table Read Protect 08000-0BFFF (Disabled)
+    config EBRT3 = OFF      ; Table Read Protect 0C000-0FFFF (Disabled)
+
+; CONFIG7H
+    config EBRTB = OFF      ; Table Read Protect Boot (Disabled)
+
 ; *****************************************************************************
 
 ; *****************************************************************************
-#define STX             0x0F            
+#define STX             0x0F
 #define ETX             0x04
 #define DLE             0x05
 #define NTX             0xFF
+#define APPBAUD         0x46   ;Application BAURD rate contention issue, so setup in bootloader
 ; *****************************************************************************
 
 ; *****************************************************************************
@@ -167,38 +228,71 @@ DATA_COUNTH         equ 0x0B        ; only for certain commands
 #ifndef AppVector
     ; The application startup GOTO instruction will be written just before the Boot Block,
     ; courtesy of the host PC bootloader application.
-    #define AppVector (BootloaderStart-.4)
+    #define AppVector (BootloaderStart-.4)  
 #endif
 ; *****************************************************************************
 
- 
+
 ; *****************************************************************************
 #if BOOTLOADER_ADDRESS != 0
     ORG     0
     ; The following GOTO is not strictly necessary, but may startup faster
     ; for large microcontrollers running at extremely slow clock speeds.
-    ;goto    BootloaderBreakCheck  
+    ;goto    BootloaderBreakCheck
 
     ORG     BOOTLOADER_ADDRESS
 BootloaderStart:
     bra     BootloadMode
-
+    
+    
 ; *****************************************************************************
 ; Determine if the application is supposed to be started or if we should
 ; go into bootloader mode.
 ;
-; If RX pin is in BREAK state when we come out of MCLR reset, immediately 
-; enter bootloader mode, even if there exists some application firmware in 
+; If RX pin is in BREAK state when we come out of MCLR reset, immediately
+; enter bootloader mode, even if there exists some application firmware in
 ; program memory.
 BootloaderBreakCheck:
     DigitalInput                ; set RX pin as digital input on certain parts
 #ifdef INVERT_UART
     btfss   RXPORT, RXPIN
 GotoAppVector:
+    #ifdef CONFIGUART
+        bsf     RCSTA1,SPEN         ;Serial port enable bit set
+        bsf     RCSTA1,CREN         ;When in async mode, enable reciever
+        bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
+        bsf     TXSTA1,TXEN         ;Enable the transmitter
+        bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
+        bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
+        bsf     RCON,IPEN           ;Enable interrupt priority
+        bsf     PIE1,RC1IE          ;Enable the receiver interrupt
+        bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
+        bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
+        bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
+        movlw   APPBAUD             ;Load value 17 into general register
+        movwf   SPBRG              ;Load the above value into register SPBRG1
+    #endif
+
     goto    AppVector           ; no BREAK state, attempt to start application
 #else
     btfsc   RXPORT, RXPIN
 GotoAppVector:
+   #ifdef CONFIGUART
+        bsf     RCSTA1,SPEN         ;Serial port enable bit set
+        bsf     RCSTA1,CREN         ;When in async mode, enable reciever
+        bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
+        bsf     TXSTA1,TXEN         ;Enable the transmitter
+        bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
+        bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
+        bsf     RCON,IPEN           ;Enable interrupt priority
+        bsf     PIE1,RC1IE          ;Enable the receiver interrupt
+        bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
+        bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
+        bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
+        movlw   APPBAUD             ;Load value 17 into general register
+        movwf   SPBRG              ;Load the above value into register SPBRG1
+    #endif
+    
     goto    AppVector           ; no BREAK state, attempt to start application
 #endif
 
@@ -224,7 +318,7 @@ BootloaderBreakCheck:
     bra     BootloadMode
 #endif
 CheckAppVector:
-    ; Read instruction at the application reset vector location. 
+    ; Read instruction at the application reset vector location.
     ; If we read 0xFFFF, assume that the application firmware has
     ; not been programmed yet, so don't try going into application mode.
     movwf   TBLPTRL
@@ -238,10 +332,27 @@ LowPriorityInterruptVector:
 
 CheckAppVector2:
     movlw   upper(AppVector)
-    movwf   TBLPTRU     
+    movwf   TBLPTRU
     tblrd   *+                  ; read instruction from program memory
-    incfsz  TABLAT, W           ; if the lower byte != 0xFF, 
+    incfsz  TABLAT, W           ; if the lower byte != 0xFF,
 GotoAppVector:
+    #ifdef CONFIGUART
+        bsf     RCSTA1,SPEN         ;Serial port enable bit set
+        bsf     RCSTA1,CREN         ;When in async mode, enable reciever
+        bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
+        bsf     TXSTA1,TXEN         ;Enable the transmitter
+        bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
+        bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
+        bsf     RCON,IPEN           ;Enable interrupt priority
+        bsf     PIE1,RC1IE          ;Enable the receiver interrupt
+        bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
+        bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
+        bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
+        movlw   APPBAUD             ;Load value 17 into general register
+        movwf   SPBRG              ;Load the above value into register SPBRG1
+    #endif
+    
+    goto    AppVector           ; no BREAK state, attempt to start application
     goto    AppVector           ; run application.
 
     tblrd   *+                  ; read instruction from program memory
@@ -341,8 +452,8 @@ DoAutoBaud:
 ;       |-------- p ----------|
 ;
 ;   p = The number of instructions between the first and last
-;           rising edge of the RS232 control sequence 0x0F. Other 
-;       possible control sequences are 0x01, 0x03, 0x07, 0x1F, 
+;           rising edge of the RS232 control sequence 0x0F. Other
+;       possible control sequences are 0x01, 0x03, 0x07, 0x1F,
 ;       0x3F, 0x7F.
 ;
 ;   SPBRG = (p / 32) - 1    BRGH = 1, BRG16 = 0
@@ -359,7 +470,7 @@ RetryAutoBaud:
     rcall   WaitForRise         ; wait for a start bit to pass by
     bsf     T0CON, TMR0ON       ; start timer counting for entire D7..D0 data bit period.
     rcall   WaitForRise         ; wait for stop bit
-    bcf     T0CON, TMR0ON       ; stop the timer from counting further. 
+    bcf     T0CON, TMR0ON       ; stop the timer from counting further.
 
     btfsc   INTCON, TMR0IF      ; if TMR0 overflowed, we did not get a good baud capture
     bra     RetryAutoBaud       ; try again
@@ -368,13 +479,13 @@ RetryAutoBaud:
     ; save new baud rate generator value
     movff   TMR0L, UxSPBRG      ; warning: must read TMR0L before TMR0H holds real data
     movff   TMR0H, UxSPBRGH
-    #else 
+    #else
     movff   TMR0L, UxSPBRG      ; warning: must read TMR0L before TMR0H holds real data
     ; TMR0H:TMR0L holds (p / 16).
     rrcf    TMR0H, w            ; divide by 2
-    rrcf    UxSPBRG, F            
+    rrcf    UxSPBRG, F
     btfss   STATUS, C           ; rounding
-    decf    UxSPBRG, F    
+    decf    UxSPBRG, F
     #endif
 
     bsf     UxRCSTA, CREN       ; start receiving
@@ -399,7 +510,7 @@ WaitForHostCommand:
     xorlw   STX
     bnz     WaitForHostCommand  ; got something unexpected, keep waiting for <STX>
 #endif ; end #ifdef USE_AUTOBAUD
-        
+
 ; *****************************************************************************
 
 ; *****************************************************************************
@@ -409,7 +520,7 @@ StartOfLine:
     rcall   SendHostByte
 
     lfsr    FSR0, COMMAND-1         ; Point to the buffer
-        
+
 ReceiveDataLoop:
     rcall   ReadHostByte            ; Get the data
     xorlw   STX                     ; Check for an unexpected STX
@@ -426,7 +537,7 @@ NoETX:
     bnz     AppendDataBuffer
 
     rcall   ReadHostByte            ; DLE received, get the next byte and store it
-    
+
 AppendDataBuffer:
     movff   RXDATA, PREINC0         ; store the data to the buffer
     bra     ReceiveDataLoop
@@ -474,7 +585,7 @@ VerifyPacketCrcLoop:
     lfsr    FSR0, PACKET_DATA
 ; ***********************************************
 
- 
+
 
 ; ***********************************************
 ; Test the command field and sub-command.
@@ -571,9 +682,9 @@ AddCrc:                           ; Init: CRCH = HHHH hhhh, CRCL = LLLL llll
 BootInfoBlock:
     db      low(BOOTBLOCKSIZE), high(BOOTBLOCKSIZE)
     db      MAJOR_VERSION, MINOR_VERSION
-    db      0xFF, 0x84             ; command mask : family id 
+    db      0xFF, 0x84             ; command mask : family id
     db      low(BootloaderStart), high(BootloaderStart)
-    db      upper(BootloaderStart), 0 
+    db      upper(BootloaderStart), 0
 BootInfoBlockEnd:
 
 ; In:   <STX>[<0x00>]<CRCL><CRCH><ETX>
@@ -612,7 +723,7 @@ ReadFlash:
 ; Out:  <STX>[<CRCL1><CRCH1>...<CRCLn><CRCHn>]<ETX>
 VerifyFlash:
     tblrd   *+
-    movf    TABLAT, w    
+    movf    TABLAT, w
     rcall   AddCrc
 
     movf    TBLPTRL, w          ; have we crossed into the next block?
@@ -621,7 +732,7 @@ VerifyFlash:
     movf    TBLPTRH, w
     andlw   high(ERASE_FLASH_BLOCKSIZE-1)
 #else
-    andlw   (ERASE_FLASH_BLOCKSIZE-1)    
+    andlw   (ERASE_FLASH_BLOCKSIZE-1)
 #endif
     bnz     VerifyFlash
 
@@ -640,7 +751,7 @@ VerifyFlash:
     bra     SendETX             ; yes, send end of packet
 
 #ifdef SOFTWP
-    reset                       ; this code -should- never be executed, but 
+    reset                       ; this code -should- never be executed, but
     reset                       ; just in case of errant execution or buggy
     reset                       ; firmware, these reset instructions may protect
     reset                       ; against accidental erases.
@@ -715,7 +826,7 @@ EraseConfigAddressOkay:
     clrf    EECON1              ; inhibit writes for this block
     bra     NextEraseBlock      ; move on to next erase block
 
-    reset                       ; this code -should- never be executed, but 
+    reset                       ; this code -should- never be executed, but
     reset                       ; just in case of errant execution or buggy
     reset                       ; firmware, these reset instruction may protect
     reset                       ; against accidental writes.
@@ -747,11 +858,11 @@ NextEraseBlock:
 #endif
 
     decfsz  DATA_COUNTL, F
-    bra     EraseFlash    
+    bra     EraseFlash
     bra     SendAcknowledge     ; All done, send acknowledgement packet
 
 #ifdef SOFTWP
-    reset                       ; this code -should- never be executed, but 
+    reset                       ; this code -should- never be executed, but
     reset                       ; just in case of errant execution or buggy
     reset                       ; firmware, these reset instructions may protect
     reset                       ; against accidental writes.
@@ -826,7 +937,7 @@ WriteConfigAddressOkay:
     clrf    EECON1                      ; inhibit writes for this block
     bra     LoadHoldingRegisters        ; fake the write so we can move on to real writes
 
-    reset                       ; this code -should- never be executed, but 
+    reset                       ; this code -should- never be executed, but
     reset                       ; just in case of errant execution or buggy
     reset                       ; firmware, these reset instruction may protect
     reset                       ; against accidental writes.
@@ -852,7 +963,7 @@ LoadHoldingRegisters:
     rcall   StartWrite          ; initiate a page write
     tblrd   *+                  ; Restore pointer for loading holding registers with next block
 
-    decfsz  DATA_COUNTL, F      
+    decfsz  DATA_COUNTL, F
     bra     WriteFlash          ; Not finished writing all blocks, repeat
     bra     SendAcknowledge     ; all done, send ACK packet
 
@@ -860,7 +971,7 @@ LoadHoldingRegisters:
 ; Out:  <STX>[<DATA>...]<CRCL><CRCH><ETX>
 #ifdef EEADR                ; some devices do not have EEPROM, so no need for this code
 ReadEeprom:
-    clrf    EECON1 
+    clrf    EECON1
 ReadEepromLoop:
     bsf     EECON1, RD          ; Read the data
     movf    EEDATA, w
@@ -898,7 +1009,7 @@ WriteEeprom:
 
 WriteEepromLoop:
     movff   PREINC0, EEDATA
-    rcall   StartWrite      
+    rcall   StartWrite
 
     btfsc   EECON1, WR      ; wait for write to complete before moving to next address
     bra     $-2
@@ -925,7 +1036,7 @@ WriteEepromLoop:
     bra     SendAcknowledge
     #endif
 #endif ; end #ifdef EEADR
- 
+
 ; In:   <STX>[<0x07><ADDRL><ADDRH><ADDRU><0x00><BYTES><DATA>...]<CRCL><CRCH><ETX>
 ; Out:  <STX>[<0x07>]<CRCL><CRCH><ETX>
 #ifndef CONFIG_AS_FLASH     ; J flash devices store config words in FLASH, so no need for this code
@@ -946,7 +1057,7 @@ WriteConfigLoop:
     bra     SendAcknowledge ; Send acknowledge
     #endif ; end #ifndef USE_SOFTCONFIGWP
 #endif ; end #ifndef CONFIG_AS_FLASH
-    
+
 ;************************************************
 
 ; ***********************************************
@@ -999,15 +1110,15 @@ SendETX:
 ; first.
 SendEscapeByte:
     movwf   TXDATA          ; Save the data
- 
+
     xorlw   STX             ; Check for a STX
     bz      WrDLE           ; No, continue WrNext
 
-    movf    TXDATA, W       
+    movf    TXDATA, W
     xorlw   ETX             ; Check for a ETX
     bz      WrDLE           ; No, continue WrNext
 
-    movf    TXDATA, W       
+    movf    TXDATA, W
     xorlw   DLE             ; Check for a DLE
     bnz     WrNext          ; No, continue WrNext
 
@@ -1022,7 +1133,7 @@ SendHostByte:
     clrwdt
     btfss   UxPIR, UxTXIF      ; Write only if TXREG is ready
     bra     $-2
-    
+
     movwf   UxTXREG           ; Start sending
 
     return
@@ -1043,11 +1154,11 @@ WaitForHostByte:
 
     movf    UxRCREG, W          ; Save the data
     movwf   RXDATA
- 
+
     return
 ; *****************************************************************************
 
-    reset                       ; this code -should- never be executed, but 
+    reset                       ; this code -should- never be executed, but
     reset                       ; just in case of errant execution or buggy
     reset                       ; firmware, these instructions may protect
     clrf    EECON1              ; against accidental erase/write operations.

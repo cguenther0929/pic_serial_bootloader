@@ -29,6 +29,11 @@
 ;#define PICDEM_LCD2             ; RB0 = 1 required to enable MAX3221 TX output on PICDEM LCD 2 demo board
 #define USE_SOFTBOOTWP          ; enable software boot block write protection
 #define USE_SOFTCONFIGWP        ; enable software config words write protection
+#define CONFIGUART              ;Define this is we want to configure the UART in the bootloader app
+                                ;The history behind this is that the UART was not functioning after
+                                ;bootloading the application which was possibly due to some strange 
+                                ;contention issue.  When configured inside the bootloader app, the UART
+                                ;works as expected.  
 
 ; Autobaud will be used by default. To save code space or to force a specific baud rate to be used, 
 ; you can optionally define a BAUDRG value instead. Most PIC18's support BRG16 mode and use the 
@@ -39,21 +44,23 @@
 ;       BAUDRG = Fosc / (16 * Baud Rate) - 1
 ;
 ; Examples:
-;#define BAUDRG .51              ; 19.2Kbps from 4MHz (BRG16 = 1, BRGH = 1)
-;#define BAUDRG .103             ; 115.2Kbps from 48MHz (BRG16 = 1, BRGH = 1)
-;#define BAUDRG .85              ; 115.2Kbps from 40MHz (BRG16 = 1, BRGH = 1)
-;#define BAUDRG .68              ; 115.2Kbps from 32MHz (BRG16 = 1, BRGH = 1)
-;#define BAUDRG .16              ; 115.2Kbps from 8MHz (BRG16 = 1, BRGH = 1)
-;#define BAUDRG .11              ; 1Mbps from 48MHz (BRG16 = 1, BRGH = 1)
-;#define BAUDRG .9               ; 1Mbps from 40MHz (BRG16 = 1, BRGH = 1)
-;#define BAUDRG .4               ; 2Mbps from 40MHz (BRG16 = 1, BRGH = 1)
-;#define BAUDRG .3               ; 3Mbps from 48MHz (BRG16 = 1, BRGH = 1)
-;#define BAUDRG .12              ; 19.2Kbps from 4MHz, 115.2Kbps from 24MHz (BRG16 = 0, BRGH = 1)
-;#define BAUDRG .10              ; 115.2Kbps from 19.6608MHz (BRG16 = 0, BRGH = 1)
+#define BAUDRG .70         ; 115200bps from 32.768 (BRG16 = 1, BRGH = 1) -- Tested and works
+;#define BAUDRG .51         ; 19.2Kbps from 4MHz (BRG16 = 1, BRGH = 1)
+;#define BAUDRG .103        ; 115.2Kbps from 48MHz (BRG16 = 1, BRGH = 1)
+;#define BAUDRG .85         ; 115.2Kbps from 40MHz (BRG16 = 1, BRGH = 1)
+;#define BAUDRG .68         ; 115.2Kbps from 32MHz (BRG16 = 1, BRGH = 1)
+;#define BAUDRG .16         ; 115.2Kbps from 8MHz (BRG16 = 1, BRGH = 1)
+;#define BAUDRG .11         ; 1Mbps from 48MHz (BRG16 = 1, BRGH = 1)
+;#define BAUDRG .9          ; 1Mbps from 40MHz (BRG16 = 1, BRGH = 1)
+;#define BAUDRG .4          ; 2Mbps from 40MHz (BRG16 = 1, BRGH = 1)
+;#define BAUDRG .3          ; 3Mbps from 48MHz (BRG16 = 1, BRGH = 1)
+;#define BAUDRG .12         ; 19.2Kbps from 4MHz, 115.2Kbps from 24MHz (BRG16 = 0, BRGH = 1)
+;#define BAUDRG .10         ; 115.2Kbps from 19.6608MHz (BRG16 = 0, BRGH = 1)
 
 ; Bootloader must start at the beginning of a FLASH Erase Block. If unspecified,
 ; bootloader will automatically be located at the end of program memory address space.
-#define BOOTLOADER_ADDRESS   0  ; bootloader at beginning, application start/ISR vectors require remapping
+;#define BOOTLOADER_ADDRESS    800 ; bootloader placed outside of boot block
+#define BOOTLOADER_ADDRESS   0   ; bootloader at beginning, application start/ISR vectors require remapping
 ;#define BOOTLOADER_ADDRESS   END_FLASH - (ERASE_FLASH_BLOCKSIZE * 20)  ; useful for running under debugger (debug executive wants to reside at the end of memory space too)
 ;#define BOOTLOADER_ADDRESS  (END_FLASH - ERASE_FLASH_BLOCKSIZE) ; use on J parts to locate inside flash config erase block
 
@@ -72,24 +79,24 @@
 ; Modify the following lines if you want to use a different UART module.
 ;
 ; Note: If your UART's RX pin happens to be multiplexed with analog ANx input
-;	functionality, you may need to edit the "preprocess.inc" DigitalInput
+;	functionality, you may need to edit the "preprocess.inc" ft232
 ;	macro. Code there needs to enable the digital input buffer (refer to
 ;	ADC chapter of your device's datasheet).
 #define UARTNUM 1
 #if UARTNUM == 1
-    #define UxSPBRG         SPBRG
-    #define UxSPBRGH        SPBRGH
-    #define UxRCSTA         RCSTA
-    #define UxTXSTA         TXSTA
-    #define UxRCREG         RCREG
-    #define UxTXREG         TXREG
+    #define UxSPBRG         SPBRG          
+    #define UxSPBRGH        SPBRGH         
+    #define UxRCSTA         RCSTA          
+    #define UxTXSTA         TXSTA          
+    #define UxRCREG         RCREG          
+    #define UxTXREG         TXREG          
     #define UxPIR           PIR1
     #define UxRCIF          RCIF
     #define UxTXIF          TXIF
     #define UxBAUDCON       BAUDCON
 
-;    #define RXPORT         PORTC   ; RX on RC7 is used by default for most PIC18's.
-;    #define RXPIN          .7
+;    #define RXPORT         PORTC   ; RX on RC7 is used by default for most PIC18's.     ;Defined in preprocess.inc
+;    #define RXPIN          .7                                                           ;Defined in preprocess.inc
 
 ;    #define RXPORT          PORTB   ; PIC18F14K50: RX on RB5/AN11
 ;    #define RXPIN           .5
@@ -136,7 +143,7 @@
 ; If you see the bootloader is reserving more FLASH memory than it really needs (you'll
 ; see a bunch of FFFF/NOP instructions at the end of the bootloader memory region),
 ; you can try reducing BOOTLOADERSIZE.
-#define BOOTLOADERSIZE  .752  			;Original value was .708
+#define BOOTLOADERSIZE  .708  			;Original value was .708  -- updated value was .752
 
-#define MAJOR_VERSION   .1              ; Bootloader Firmware Version
-#define MINOR_VERSION   .8
+#define MAJOR_VERSION   .2              ; Bootloader Firmware Version
+#define MINOR_VERSION   .0
