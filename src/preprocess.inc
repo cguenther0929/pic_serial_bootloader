@@ -22,7 +22,7 @@
 ; MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE
 ; OF THESE TERMS.
 
-DigitalInput macro
+ft232 macro
 #ifdef __18F1320
     #if BOOTLOADER_ADDRESS == 0
     nop                         ; start up GOTO instruction errata

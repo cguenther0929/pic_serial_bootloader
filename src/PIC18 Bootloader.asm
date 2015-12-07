@@ -117,7 +117,7 @@
 ; CONFIG1L
     config RETEN = ON       ; VREG Sleep Enable bit (Enabled)
     config INTOSCSEL = HIGH ; LF-INTOSC Low-power Enable bit (LF-INTOSC in High-power mode during Sleep)
-    config SOSCSEL = DIG    ; SOSC Power Selection and mode Configuration bits (High Power SOSC circuit selected)
+    config SOSCSEL = DIG    ; SOSC Power Selection and mode Configuration bits (Make this a digital pin for TACH1B)
     config XINST = OFF      ; Extended Instruction Set (Disabled)
     
 ; CONFIG1H
@@ -140,13 +140,13 @@
     config RTCOSC = SOSCREF ; RTCC Clock Select (RTCC uses SOSC)
     ;
 ; CONFIG3H
-    config CCP2MX = PORTBE  ; TODO comment
+    config CCP2MX = PORTBE  ; CCP2 Mux (RE7-Microcontroller Mode/RB3-All other modes)
     config MSSPMSK = MSK7   ; MSSP address masking (7 Bit address masking mode)
     config MCLRE = ON       ; Master Clear Enable (MCLR Enabled, RG5 Disabled)
     
 ; CONFIG4L
     config STVREN = ON      ; Stack Overflow Reset (Enabled)
-    config BBSIZ = BB2K     ; Boot Block Size (2K word Boot Block size)
+    config BBSIZ = BB1K     ; Boot Block Size (2K word Boot Block size)
     
 ; CONFIG5L
     config CP0 = OFF        ; Code Protect 00800-03FFF (Disabled)
@@ -156,7 +156,7 @@
     
 ; CONFIG5H
     config CPB = OFF        ; Code Protect Boot (Disabled)
-    config CPD = OFF        ; Data EE Read Protect (Disabled)
+    config CPD = ON         ; Data EEPROM Protect (Enabled) -- processor can still read / write
     
 ; CONFIG6L
     config WRT0 = OFF       ; Table Write Protect 00800-03FFF (Disabled)
@@ -185,6 +185,7 @@
 #define ETX             0x04
 #define DLE             0x05
 #define NTX             0xFF
+#define APPBAUD         0x46   ;Application BAURD rate contention issue, so setup in bootloader
 ; *****************************************************************************
 
 ; *****************************************************************************
@@ -227,7 +228,7 @@ DATA_COUNTH         equ 0x0B        ; only for certain commands
 #ifndef AppVector
     ; The application startup GOTO instruction will be written just before the Boot Block,
     ; courtesy of the host PC bootloader application.
-    #define AppVector (BootloaderStart-.4)
+    #define AppVector (BootloaderStart-.4)  
 #endif
 ; *****************************************************************************
 
@@ -242,7 +243,8 @@ DATA_COUNTH         equ 0x0B        ; only for certain commands
     ORG     BOOTLOADER_ADDRESS
 BootloaderStart:
     bra     BootloadMode
-
+    
+    
 ; *****************************************************************************
 ; Determine if the application is supposed to be started or if we should
 ; go into bootloader mode.
@@ -255,10 +257,38 @@ BootloaderBreakCheck:
 #ifdef INVERT_UART
     btfss   RXPORT, RXPIN
 GotoAppVector:
+    bsf     RCSTA1,SPEN         ;Serial port enable bit set
+    bsf     RCSTA1,CREN         ;When in async mode, enable reciever
+    bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
+    bsf     TXSTA1,TXEN         ;Enable the transmitter
+    bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
+    bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
+    bsf     RCON,IPEN           ;Enable interrupt priority
+    bsf     PIE1,RC1IE          ;Enable the receiver interrupt
+    bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
+    bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
+    bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
+    movlw   APPBAUD             ;Load value 17 into general register
+    movwf   SPBRG              ;Load the above value into register SPBRG1
+
     goto    AppVector           ; no BREAK state, attempt to start application
 #else
     btfsc   RXPORT, RXPIN
 GotoAppVector:
+    bsf     RCSTA1,SPEN         ;Serial port enable bit set
+    bsf     RCSTA1,CREN         ;When in async mode, enable reciever
+    bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
+    bsf     TXSTA1,TXEN         ;Enable the transmitter
+    bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
+    bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
+    bsf     RCON,IPEN           ;Enable interrupt priority
+    bsf     PIE1,RC1IE          ;Enable the receiver interrupt
+    bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
+    bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
+    bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
+    movlw   APPBAUD             ;Load value 17 into general register
+    movwf   SPBRG              ;Load the above value into register SPBRG1
+    
     goto    AppVector           ; no BREAK state, attempt to start application
 #endif
 
@@ -302,6 +332,21 @@ CheckAppVector2:
     tblrd   *+                  ; read instruction from program memory
     incfsz  TABLAT, W           ; if the lower byte != 0xFF,
 GotoAppVector:
+    bsf     RCSTA1,SPEN         ;Serial port enable bit set
+    bsf     RCSTA1,CREN         ;When in async mode, enable reciever
+    bsf     TXSTA1,CSRC         ;Set clock source select bit, however, this is don't care in async mode
+    bsf     TXSTA1,TXEN         ;Enable the transmitter
+    bsf     TXSTA1,BRGH1        ;Enable high speed baud rate eq: 
+    bsf     TRISC,TRISC7        ;Set C7 to be an input (RX pin)
+    bsf     RCON,IPEN           ;Enable interrupt priority
+    bsf     PIE1,RC1IE          ;Enable the receiver interrupt
+    bsf     IPR1,RC1IP          ;Make the UART receive interrupt high priority
+    bcf     TRISC,TRISC6        ;Set C6 to be an output (TX pin)
+    bcf     BAUDCON1,BRG16      ;Make sure we are setup for an 8 bit baudcon register
+    movlw   APPBAUD             ;Load value 17 into general register
+    movwf   SPBRG              ;Load the above value into register SPBRG1
+    
+    goto    AppVector           ; no BREAK state, attempt to start application
     goto    AppVector           ; run application.
 
     tblrd   *+                  ; read instruction from program memory
