@@ -38,11 +38,20 @@ DEBUGGABLE_SUFFIX=cof
 FINAL_IMAGE=dist/${CND_CONF}/${IMAGE_TYPE}/MPLABX_Bootloader.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 endif
 
+ifeq ($(COMPARE_BUILD), true)
+COMPARISON_BUILD=
+else
+COMPARISON_BUILD=
+endif
+
 # Object Directory
 OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 
 # Distribution Directory
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
+
+# Source Files Quoted if spaced
+SOURCEFILES_QUOTED_IF_SPACED="../PIC18 Bootloader.asm"
 
 # Object Files Quoted if spaced
 OBJECTFILES_QUOTED_IF_SPACED="${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o"
@@ -50,6 +59,9 @@ POSSIBLE_DEPFILES="${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o.d"
 
 # Object Files
 OBJECTFILES=${OBJECTDIR}/_ext/1472/PIC18\ Bootloader.o
+
+# Source Files
+SOURCEFILES=../PIC18 Bootloader.asm
 
 
 CFLAGS=
@@ -66,7 +78,10 @@ LDLIBSOPTIONS=
 FIXDEPS=fixDeps
 
 .build-conf:  ${BUILD_SUBPROJECTS}
-	${MAKE} ${MAKE_OPTIONS} -f nbproject/Makefile-default.mk dist/${CND_CONF}/${IMAGE_TYPE}/MPLABX_Bootloader.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+ifneq ($(INFORMATION_MESSAGE), )
+	@echo $(INFORMATION_MESSAGE)
+endif
+	${MAKE}  -f nbproject/Makefile-default.mk dist/${CND_CONF}/${IMAGE_TYPE}/MPLABX_Bootloader.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 
 MP_PROCESSOR_OPTION=18f66k22
 MP_LINKER_DEBUG_OPTION=
@@ -74,25 +89,29 @@ MP_LINKER_DEBUG_OPTION=
 # Rules for buildStep: assemble
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 ${OBJECTDIR}/_ext/1472/PIC18\ Bootloader.o: ../PIC18\ Bootloader.asm  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1472 
-	@${RM} ${OBJECTDIR}/_ext/1472/PIC18\ Bootloader.o.d 
-	@${FIXDEPS} dummy.d -e "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader.ERR" $(SILENT) -rsi ${MP_AS_DIR} -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  $(ASM_OPTIONS)   \"C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader.asm\" 
-	@${MV}  "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader".O "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o"
-	@${MV}  "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader".ERR "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".err
-	@${MV}  "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader".LST "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".lst
-	@${RM}  "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader".HEX 
+	@${MKDIR} "${OBJECTDIR}/_ext/1472" 
+	@${RM} "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".d 
+	@${RM} "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o" 
+	@${FIXDEPS} dummy.d -e "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader.ERR" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -d__DEBUG -d__MPLAB_DEBUGGER_ICD3=1 -q -p$(MP_PROCESSOR_OPTION)  $(ASM_OPTIONS)    \"C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader.asm\" 
+	@${MV}  "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader".O "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o"
+	@${MV}  "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader".ERR "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".err
+	@${MV}  "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader".LST "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".lst
+	@${RM}  "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader".HEX 
 	@${DEP_GEN} -d "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o"
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 else
 ${OBJECTDIR}/_ext/1472/PIC18\ Bootloader.o: ../PIC18\ Bootloader.asm  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1472 
-	@${RM} ${OBJECTDIR}/_ext/1472/PIC18\ Bootloader.o.d 
-	@${FIXDEPS} dummy.d -e "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader.ERR" $(SILENT) -rsi ${MP_AS_DIR} -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  $(ASM_OPTIONS)   \"C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader.asm\" 
-	@${MV}  "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader".O "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o"
-	@${MV}  "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader".ERR "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".err
-	@${MV}  "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader".LST "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".lst
-	@${RM}  "C:/Users/Clinton Guenther/Desktop/QuEST Firmware/picserialbl/src/MPLABX Bootloader.X/../PIC18 Bootloader".HEX 
+	@${MKDIR} "${OBJECTDIR}/_ext/1472" 
+	@${RM} "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".d 
+	@${RM} "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o" 
+	@${FIXDEPS} dummy.d -e "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader.ERR" $(SILENT) -c ${MP_AS} $(MP_EXTRA_AS_PRE) -q -p$(MP_PROCESSOR_OPTION)  $(ASM_OPTIONS)    \"C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader.asm\" 
+	@${MV}  "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader".O "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o"
+	@${MV}  "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader".ERR "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".err
+	@${MV}  "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader".LST "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o".lst
+	@${RM}  "C:/Users/Clinton Guenther/Desktop/Firmware/picserialbl/src/PIC18 Bootloader".HEX 
 	@${DEP_GEN} -d "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o"
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1472/PIC18 Bootloader.o.d" $(SILENT) -rsi ${MP_AS_DIR} -c18 
 	
 endif
 
