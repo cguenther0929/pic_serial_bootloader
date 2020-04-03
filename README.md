@@ -18,4 +18,4 @@ The Panel Interface Processor (PIP) is the **PIC18F66K22**.  Serial communicatio
 
 * Revision v2.0 -- Bootload BAUD rate hardcoded at 115200bps.  Bootloader size adjusted accordingly.  Bootloader resides at the beginning of program space, thus reset/interrupt vectors have been remapped.  
 
-* Revision v2.1 -- Simply updated .gitignore file.
+* Revision v2.1 -- .gitignore file was updated.  Upgraded project to MPLAB X latest project version (permission requested when launching the project).  The latest project version was used and tested when building this bootloader for the PIC18F67K22 (different repository), thus mitigating risk.  Changed version number to 2.1 in bootconfig.inc.  
