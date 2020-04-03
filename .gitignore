@@ -5,6 +5,8 @@ src/MPLABX Bootloader.X/l.obj
 src/MPLABX Bootloader.X/build
 src/MPLABX Bootloader.X/dist
 src/MPLABX Bootloader.X/nbproject/*
+src/PIC18 Bootloader.ERR
+src/PIC18 Bootloader.LST
 !src/MPLABX Bootloader.X/nbproject/configurations.xml
 !src/MPLABX Bootloader.X/nbproject/project.xml
 
